@@ -756,7 +756,7 @@ static void frankenphp_register_variables(zval *track_vars_array) {
   /* https://www.php.net/manual/en/reserved.variables.server.php */
 
   /* In CGI mode, we consider the environment to be a part of the server
-   * variables
+   * variables.
    */
   struct go_getfullenv_return full_env = go_getfullenv(thread_index);
 
@@ -774,8 +774,6 @@ static void frankenphp_register_variables(zval *track_vars_array) {
     // release the key string
     zend_string_release(key_str);
   }
-
-  // php_import_environment_variables(track_vars_array);
 
   go_register_variables(thread_index, track_vars_array);
 }
