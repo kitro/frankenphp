@@ -758,7 +758,24 @@ static void frankenphp_register_variables(zval *track_vars_array) {
   /* In CGI mode, we consider the environment to be a part of the server
    * variables
    */
-  php_import_environment_variables(track_vars_array);
+  struct go_getfullenv_return full_env = go_getfullenv(thread_index);
+
+  for (int i = 0; i < full_env.r1; i++) {
+    go_string key = full_env.r0[i * 2];
+    go_string val = full_env.r0[i * 2 + 1];
+
+    // create PHP strings for key and value
+    zend_string *key_str = zend_string_init(key.data, key.len, 0);
+    zend_string *val_str = zend_string_init(val.data, val.len, 0);
+
+    // add to the associative array
+    add_assoc_str(track_vars_array, ZSTR_VAL(key_str), val_str);
+
+    // release the key string
+    zend_string_release(key_str);
+  }
+
+  // php_import_environment_variables(track_vars_array);
 
   go_register_variables(thread_index, track_vars_array);
 }
